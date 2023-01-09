@@ -53,7 +53,7 @@ function App() {
 
             const substrateAddress = Utils.getSubstrateAddressFromEcdsa(publicKey)
 
-            const transaction = api.tx.balances.transfer.call(api,'5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY', 12345)
+            const transaction = api.tx.balances.transfer('5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY', 12345)
             // TEMP
             console.log({ substrateAddress })
             const nonce = await apiInstance.getAccountNonce(substrateAddress)
@@ -66,6 +66,7 @@ function App() {
                 runtimeVersion: api.runtimeVersion,
                 version: api.extrinsicVersion
             })
+            console.log({signingPayload})
             // END TEMP
 
             const extrinsicPayload = await apiInstance.createExtrinsicPayload(transaction, substrateAddress)
@@ -76,12 +77,12 @@ function App() {
 
             let signatureEcdsa = await web3.eth.sign(u8aToHex(payloadHash), accounts[0]);
 
-            const sendFunction = apiInstance.getTransactionSender(transaction, address, signatureEcdsa, signingPayload);
-            console.log(sendFunction)
+            const rtx = apiInstance.getTransactionSender(transaction, address, signatureEcdsa, signingPayload);
+            console.log(rtx)
             const callback = function (data) {
                 console.log(data)
             }
-            sendFunction()
+            rtx.send(callback)
         }
     }
 
